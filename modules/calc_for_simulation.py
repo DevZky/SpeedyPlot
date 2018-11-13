@@ -73,44 +73,37 @@ def calculation(dataframes):
         #pel_LZ_end = [df[1]["P"].iloc[df[1].index.get_loc(i)-1] for i in list(pDiffs[pDiffs<-20].index)]
         
         pel_LZ_end = df[1]["P"][df[1]["P"].diff(periods= - 1)>20]
-        
         thd_LZ_end = df[1]["THD"][df[1]["Compressor"].diff(periods=-1)==1]
-        
         tnd_LZ_end = df[1]["TND"][df[1]["Compressor"].diff(periods=-1)==1]
         
         fcs_LZ_start = df[1]["FgCompSensor"][df[1]["Compressor"].diff()==1]
-        
         fcs_LZ_end = df[1]["FgCompSensor"][df[1]["Compressor"].diff(periods=-1)==1]
         
-        ccs_LZ_start  = df[1]["CCompSensor"][df[1]["Compressor"].diff()==1]
         
+        # digital sensors of the fridge
+        ccs_LZ_start  = df[1]["CCompSensor"][df[1]["Compressor"].diff()==1]
         ccs_LZ_end = df[1]["CCompSensor"][df[1]["Compressor"].diff(periods=-1)==1]
         
         cces_LZ_start = df[1]["CCompEvapSensor"][df[1]["Compressor"].diff()==1]
-        
         cces_LZ_end = df[1]["CCompEvapSensor"][df[1]["Compressor"].diff(periods=-1)==1]
 
+        # electrical power consumption
         pel_LZ = df[1]["P"][df[1]["P"]>40.0]
+        pel_SZ = df[1]["P"][df[1]["P"]<5.0]
         
-        pel_SZ = df[1]["P"][df[1]["P"]<5.0]    
-        
-        tkf = df[1]["TKF oben"].add(df[1]["TKF mitte"]).add(df[1]["TKF unten"])/3
-        
-        tkf_LZ = tkf[df[1]["Compressor"]==1]
-        
-        tkf_LZ_end = tkf[df[1]["Compressor"].diff(periods=-1)==1]
-        
+        # average temperature of the cooling compartment
+        tkf = df[1]["TKF oben"].add(df[1]["TKF mitte"]).add(df[1]["TKF unten"])/3        
+        tkf_LZ = tkf[df[1]["Compressor"]==1]        
+        tkf_LZ_end = tkf[df[1]["Compressor"].diff(periods=-1)==1]        
         tkf_LZ_start = tkf[df[1]["Compressor"].diff()==1]
-        
+                
+        # average temperature of the vita fresh compartment
         try:
             tvf = df[1]["TKLF o"].add(df[1]["TKLF m"]).add(df[1]["TKLF u"])/3
         except:
-            tvf = df[1]["P"]*0
-        
-        tvf_LZ = tvf[df[1]["Compressor"]==1]
-    
-        tvf_LZ_end =  tvf[df[1]["Compressor"].diff(periods=-1)==1]
-    
+            tvf = df[1]["P"]*0        
+        tvf_LZ = tvf[df[1]["Compressor"]==1]    
+        tvf_LZ_end =  tvf[df[1]["Compressor"].diff(periods=-1)==1]    
         tvf_LZ_start = tvf[df[1]["Compressor"].diff()==1]
 
         try:
@@ -119,10 +112,6 @@ def calculation(dataframes):
         except:
             tovfm_LZ = df[1]["P"]*0
             tovfm_LZ_end = df[1]["P"]*0
-        
-        
-        
-        
         
         cycletime = sum(szt)/len(szt) + sum(lzt)/len(lzt)
         ean =  (pel_LZ.mean()*sum(lzt)/len(lzt) + pel_SZ.mean()*sum(szt)/len(szt))/cycletime/1000*24
@@ -163,7 +152,7 @@ def calculation(dataframes):
         
         # print to console for copy-paste to modelica model
         print("{}\n".format(df[0])+
-                "TR_m={:.4f},\n".format(df[1]["TR"].mean())+
+              "TR_m={:.4f},\n".format(df[1]["TR"].mean())+
               "dTK_H={:.4f},\n".format(tkf_LZ_start.mean()-tkf_LZ_end.mean())+
               "dVF_H={:.4f},\n".format(tvf_LZ_start.mean()-tvf_LZ_end.mean())+
               f"EAN_m={ean:.4f},\n"+ 
@@ -177,8 +166,7 @@ def calculation(dataframes):
               f"TKF(mean_m={tkf.mean():.4f}),\n"+ 
               f"TVF(mean_m={tvf.mean():.4f}),\n"+ 
               "TSR(meanLZ_m={:.4f},endLZ_m={:.4f}),\n".format(tsr_LZ.mean(),tsr_LZ_end.mean())
-                )
-            
+             )
             
             
     # after calculation: for every measurement --> write data from excellist to .xlsx file        
