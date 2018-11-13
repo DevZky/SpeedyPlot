@@ -11,4 +11,7 @@
   * ...
 * read data from variable location
 * get initial settings from config file
+* select rows
+  * name of columns  
+* analyse section (modular structure --> choose from different presets)
 * ...
